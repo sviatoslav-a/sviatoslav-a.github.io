@@ -1,0 +1,64 @@
+---
+import { path, stack, pick, type Lang } from '../data/content';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section class="section" id="path">
+  <div class="wrap path-grid">
+    <div>
+      <div class="section-head reveal">
+        <span class="section-num">05</span>
+        <h2>{pick(path.title, lang)}</h2>
+      </div>
+      <ol class="timeline">
+        {path.items.map((p) => (
+          <li class="reveal">
+            <span class="tl-years mono">{p.years}</span>
+            <div class="tl-body">
+              <h3>{p.company}</h3>
+              <span class="tl-role">{pick(p.role, lang)}</span>
+              <p>{pick(p.text, lang)}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p class="edu reveal">{pick(path.edu, lang)}</p>
+      <p class="edu reveal">{pick(path.oss, lang)}</p>
+    </div>
+    <aside class="stack card reveal">
+      <h3>{pick(stack.title, lang)}</h3>
+      {stack.groups.map((g) => (
+        <div class="sg">
+          <span class="mono sg-n">{pick(g.name, lang)}</span>
+          <div class="sg-items">{g.items.map((i) => <span class="chip">{i}</span>)}</div>
+        </div>
+      ))}
+    </aside>
+  </div>
+</section>
+
+<style>
+  .path-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: clamp(28px, 5vw, 72px); align-items: start; }
+  .timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 118px; top: 8px; bottom: 8px; width: 1px; background: var(--line-2); }
+  .timeline li { display: grid; grid-template-columns: 104px 1fr; gap: 30px; padding-bottom: 30px; position: relative; }
+  .timeline li::before { content: ''; position: absolute; left: 114px; top: 7px; width: 9px; height: 9px; background: var(--bg); border: 1.5px solid var(--accent); border-radius: 2px; }
+  .timeline li:first-child::before { background: var(--accent); }
+  .tl-years { font-size: 13px; color: var(--muted); padding-top: 2px; text-align: right; }
+  .tl-body h3 { font-size: 21px; }
+  .tl-role { display: block; color: var(--accent); font-size: 14px; margin-top: 4px; }
+  .tl-body p { margin: 8px 0 0; color: var(--ink-2); }
+  .edu { color: var(--muted); font-size: 14.5px; margin: 6px 0 0; }
+  .stack { padding: 26px; position: sticky; top: 100px; }
+  .stack h3 { margin-bottom: 18px; }
+  .sg + .sg { margin-top: 18px; }
+  .sg-n { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .sg-items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  @media (max-width: 900px) { .path-grid { grid-template-columns: 1fr; } .stack { position: static; } }
+  @media (max-width: 520px) {
+    .timeline::before { left: 4px; }
+    .timeline li { grid-template-columns: 1fr; gap: 4px; padding-left: 26px; }
+    .timeline li::before { left: 0; }
+    .tl-years { text-align: left; }
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from './Hero.astro';
+import Fit from './Fit.astro';
+import Cases from './Cases.astro';
+import Pilots from './Pilots.astro';
+import Process from './Process.astro';
+import Path from './Path.astro';
+import Contact from './Contact.astro';
+import { buildIndex } from '../data/searchIndex';
+import type { Lang } from '../data/content';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const repo = 'https://github.com/zotho/goulash-portfolio';
+const title = lang === 'ru'
+  ? 'Святослав Алексеев · AI engineer для Goulash.tech'
+  : 'Sviatoslav Alekseev · AI engineer for Goulash.tech';
+const description = lang === 'ru'
+  ? 'LLM-агенты, интеграции и AI-автоматизация в продакшне: проекты, доказательства под каждое требование вакансии и три интерактивных пилота для ERP.'
+  : 'LLM agents, integrations and AI automation in production: projects, evidence for every vacancy requirement and three interactive ERP pilots.';
+---
+<Layout lang={lang} title={title} description={description}>
+  <Hero lang={lang} />
+  <Fit lang={lang} />
+  <Cases lang={lang} />
+  <Pilots lang={lang} />
+  <Process lang={lang} />
+  <Path lang={lang} />
+  <Contact lang={lang} repo={repo} />
+  <script type="application/json" id="search-index" set:html={JSON.stringify(buildIndex(lang))} />
+  <script>
+    import '../scripts/main.ts';
+  </script>
+</Layout>

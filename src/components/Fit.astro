@@ -1,0 +1,128 @@
+---
+import { fit, levels, cases, pick, type Lang, type Level } from '../data/content';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const groups = [
+  ['duty', { ru: 'Задачи', en: 'Duties' }],
+  ['must', { ru: 'Для нас важно', en: 'Must have' }],
+  ['plus', { ru: 'Плюсом', en: 'Nice to have' }],
+] as const;
+const covered = fit.items.filter((i) => i.level !== 'growing').length;
+const total = fit.items.length;
+const pct = Math.round((covered / total) * 100);
+const caseTitle = (id: string) => cases.find((c) => c.id === id)?.title[lang] ?? id;
+const lvl = (l: Level) => pick(levels[l], lang);
+---
+<section class="section" id="fit">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-num">01 / hh.ru/vacancy/137989678</span>
+      <h2>{pick(fit.title, lang)}</h2>
+      <p class="lead">{pick(fit.lead, lang)}</p>
+    </div>
+
+    <div class="fit-grid" data-fit>
+      <div class="fit-list reveal">
+        {groups.map(([g, gl]) => (
+          <div class="fit-group">
+            <h3 class="mono fit-gtitle">{pick(gl, lang)}</h3>
+            <div class="fit-chips" role="tablist" aria-label={pick(gl, lang)}>
+              {fit.items.filter((i) => i.group === g).map((it) => (
+                <button
+                  type="button"
+                  class={`fit-chip lv-${it.level}`}
+                  id={`fit-${it.id}`}
+                  role="tab"
+                  aria-selected={it.id === fit.items[0].id ? 'true' : 'false'}
+                  aria-controls={`fitp-${it.id}`}
+                  data-fit-tab={it.id}
+                >
+                  <span class="dot" aria-hidden="true"></span>{pick(it.label, lang)}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div class="legend mono">
+          {(['prod', 'project', 'growing'] as Level[]).map((l) => (
+            <span class={`lg lv-${l}`}><span class="dot" aria-hidden="true"></span>{lvl(l)}</span>
+          ))}
+        </div>
+      </div>
+
+      <div class="fit-side reveal">
+        <div class="coverage card">
+          <svg viewBox="0 0 120 120" class="ring" aria-hidden="true">
+            <circle cx="60" cy="60" r="52" class="ring-bg" />
+            <circle cx="60" cy="60" r="52" class="ring-fg" style={`--pct:${pct}`} pathLength="100" />
+          </svg>
+          <div>
+            <div class="cov-v mono">{covered}/{total}</div>
+            <div class="cov-l">{pick(fit.coverage, lang)}</div>
+          </div>
+        </div>
+        {fit.items.map((it, idx) => (
+          <div class="fit-panel card" id={`fitp-${it.id}`} role="tabpanel" aria-labelledby={`fit-${it.id}`} data-fit-panel={it.id} hidden={idx !== 0}>
+            <div class="fp-head">
+              <span class={`chip lv-${it.level}`}><span class="dot" aria-hidden="true"></span>{lvl(it.level)}</span>
+            </div>
+            <h3>{pick(it.label, lang)}</h3>
+            <ul class="fp-ev">
+              {it.evidence.map((e) => <li>{pick(e, lang)}</li>)}
+            </ul>
+            <div class="fp-links">
+              {it.cases.map((c) => (
+                <a class="fp-link" href={`#case-${c}`} data-open-case={c}>
+                  <span class="mono">{pick(fit.seeCase, lang)} →</span> {caseTitle(c)}
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fit-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: start; }
+  .fit-group + .fit-group { margin-top: 28px; }
+  .fit-gtitle { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; margin-bottom: 12px; }
+  .fit-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fit-chip {
+    display: inline-flex; align-items: center; gap: 9px; text-align: left;
+    padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line);
+    background: var(--panel); cursor: pointer; font-size: 15px; line-height: 1.3;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  }
+  .fit-chip:hover { transform: translateY(-1px); border-color: var(--line-2); }
+  .fit-chip[aria-selected='true'] { border-color: var(--accent); background: var(--accent-soft); }
+  .dot { width: 8px; height: 8px; border-radius: 2px; flex: none; background: var(--muted); }
+  .lv-prod .dot { background: var(--accent); }
+  .lv-project .dot { background: var(--ok); }
+  .lv-growing .dot { background: transparent; outline: 1.5px dashed var(--warn); outline-offset: -1px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 28px; font-size: 12.5px; color: var(--muted); }
+  .lg { display: inline-flex; align-items: center; gap: 8px; }
+
+  .fit-side { position: sticky; top: 92px; display: grid; gap: 14px; }
+  .coverage { display: flex; align-items: center; gap: 18px; padding: 18px 22px; }
+  .ring { width: 72px; height: 72px; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 10; }
+  .ring-bg { stroke: var(--line); }
+  .ring-fg { stroke: var(--accent); stroke-dasharray: var(--pct) 100; stroke-linecap: round; transition: stroke-dasharray 1.2s; }
+  .cov-v { font-size: 30px; font-weight: 700; }
+  .cov-l { color: var(--muted); font-size: 14px; }
+  .fit-panel { padding: 26px; animation: pop 0.35s cubic-bezier(.2,.7,.2,1); }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px); } }
+  .fit-panel h3 { margin: 14px 0 12px; font-size: 22px; }
+  .fp-ev { margin: 0; padding-left: 18px; display: grid; gap: 10px; color: var(--ink-2); }
+  .fp-ev li::marker { color: var(--accent); }
+  .fp-links { display: grid; gap: 8px; margin-top: 20px; }
+  .fp-link { display: block; padding: 10px 14px; border-radius: 10px; background: var(--panel-2); text-decoration: none; border: 1px solid var(--line); font-size: 14.5px; }
+  .fp-link:hover { border-color: var(--accent); }
+  .fp-link .mono { color: var(--accent); font-size: 12.5px; margin-right: 6px; }
+  .chip.lv-prod { color: var(--accent); }
+  .chip.lv-project { color: var(--ok); }
+  .chip.lv-growing { color: var(--warn); }
+  @media (max-width: 900px) { .fit-grid { grid-template-columns: 1fr; } .fit-side { position: static; } }
+</style>

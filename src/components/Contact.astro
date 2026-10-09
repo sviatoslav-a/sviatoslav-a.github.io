@@ -1,0 +1,54 @@
+---
+import { contact, person, pick, type Lang } from '../data/content';
+interface Props { lang: Lang; repo: string }
+const { lang, repo } = Astro.props;
+const links = [
+  { href: `https://t.me/${person.telegram}`, label: 'Telegram', value: `@${person.telegram}`, primary: true },
+  { href: `mailto:${person.email}`, label: 'Email', value: person.email },
+  { href: `https://github.com/${person.github}`, label: 'GitHub', value: `github.com/${person.github}` },
+  { href: `https://www.linkedin.com/in/${person.linkedin}`, label: 'LinkedIn', value: `in/${person.linkedin}` },
+];
+---
+<section class="section contact" id="contact">
+  <div class="wrap">
+    <div class="contact-card card reveal">
+      <span class="section-num">06</span>
+      <h2>{pick(contact.title, lang)}</h2>
+      <p class="lead">{pick(contact.lead, lang)}</p>
+      <div class="links">
+        {links.map((l) => (
+          <a class={`lnk${l.primary ? ' primary' : ''}`} href={l.href} target="_blank" rel="noopener">
+            <span class="mono">{l.label}</span>
+            <b>{l.value}</b>
+            <span class="arr" aria-hidden="true">↗</span>
+          </a>
+        ))}
+      </div>
+    </div>
+    <footer class="foot">
+      <p>{pick(contact.colophon, lang)}</p>
+      <p class="mono"><a href={repo} target="_blank" rel="noopener">{pick(contact.repo, lang)} ↗</a> · <a href="/llms.txt">llms.txt</a> · © 2026 {pick(person.name, lang)}</p>
+    </footer>
+  </div>
+</section>
+
+<style>
+  .contact-card { padding: clamp(28px, 6vw, 72px); position: relative; overflow: hidden; }
+  .contact-card::after {
+    content: ''; position: absolute; right: -60px; top: -60px; width: 280px; height: 280px;
+    background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+    pointer-events: none;
+  }
+  .contact-card h2 { margin-top: 14px; max-width: 18ch; }
+  .links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 36px; }
+  .lnk { display: grid; grid-template-columns: 90px 1fr auto; align-items: center; gap: 12px; padding: 18px 20px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel-2); text-decoration: none; transition: border-color 0.2s, transform 0.2s; min-width: 0; }
+  .lnk:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .lnk .mono { color: var(--muted); font-size: 12.5px; }
+  .lnk b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lnk.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .lnk.primary .mono { color: inherit; opacity: 0.7; }
+  .foot { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 36px 0 12px; color: var(--muted); font-size: 13.5px; }
+  .foot p { margin: 0; max-width: 60ch; }
+  .foot a { color: var(--ink-2); }
+  @media (max-width: 700px) { .links { grid-template-columns: 1fr; } .lnk { grid-template-columns: 76px 1fr auto; } }
+</style>

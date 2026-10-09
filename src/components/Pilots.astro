@@ -1,0 +1,182 @@
+---
+import { pilots, ui, pick, type Lang } from '../data/content';
+import { scenarios } from '../data/pilotData';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const tabs = ['search', 'segments', 'kitchen'] as const;
+const icons: Record<(typeof tabs)[number], string> = {
+  search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-3.5-3.5',
+  segments: 'M5 17a2 2 0 1 0 0 .1M12 7a2 2 0 1 0 0 .1M19 14a2 2 0 1 0 0 .1M7 16l4-7M14 8l4 5',
+  kitchen: 'M3 20h18M5 20V10M10 20V5M15 20v-8M20 20V8',
+};
+const measureLabel = { ru: 'Метрика пилота', en: 'Pilot metric' };
+const sourcesLabel = { ru: 'Источники', en: 'Sources' };
+---
+<section class="section pilots" id="pilots">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-num">03 / ERP · marketing · kitchen</span>
+      <h2>{pick(pilots.title, lang)}</h2>
+      <p class="lead">{pick(pilots.lead, lang)}</p>
+    </div>
+
+    <div class="pilot-shell card reveal" data-pilots data-kitchen-ok={pick(pilots.kitchen.ok, lang)} data-kitchen-load={pick(pilots.kitchen.load, lang)}>
+      <div class="pilot-tabs" role="tablist" aria-label={pick(pilots.title, lang)}>
+        {tabs.map((t, i) => (
+          <button type="button" role="tab" id={`pilot-${t}`} aria-controls={`pp-${t}`} aria-selected={i === 0 ? 'true' : 'false'} data-pilot-tab={t}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d={icons[t]} /></svg>
+            <span class="pt-n mono">0{i + 1}</span>{pick(pilots.tabs[t], lang)}
+          </button>
+        ))}
+      </div>
+
+      <!-- 1. Smart search -->
+      <div class="pilot-panel" role="tabpanel" id="pp-search" aria-labelledby="pilot-search" data-pilot-panel="search">
+        <div class="pp-top">
+          <p>{pick(pilots.search.intro, lang)}</p>
+          <span class="badge-demo">{pick(ui.demoBadge, lang)}</span>
+        </div>
+        <form class="ask" data-ask>
+          <input type="text" name="q" data-ask-input value={pick(pilots.search.presets[0], lang)} aria-label={pick(pilots.search.run, lang)} />
+          <button class="btn primary" type="submit">{pick(pilots.search.run, lang)} →</button>
+        </form>
+        <div class="presets">
+          {pilots.search.presets.map((p, i) => <button type="button" class="chip" data-preset={i}>{pick(p, lang)}</button>)}
+        </div>
+        <div class="ask-out">
+          <ol class="ask-trace mono" data-ask-trace aria-live="polite"></ol>
+          <div class="ask-answer" data-ask-answer hidden>
+            <p data-ask-text></p>
+            <div class="ask-src"><span class="mono">{pick(sourcesLabel, lang)}:</span> <span data-ask-src></span></div>
+            <div class="ask-fb" aria-hidden="true"><span>👍</span><span>👎</span></div>
+          </div>
+        </div>
+        <p class="measure"><b class="mono">{pick(measureLabel, lang)}</b>{pick(pilots.search.measure, lang)}</p>
+        <script type="application/json" data-scenarios set:html={JSON.stringify(scenarios[lang])} />
+      </div>
+
+      <!-- 2. Segmentation -->
+      <div class="pilot-panel" role="tabpanel" id="pp-segments" aria-labelledby="pilot-segments" data-pilot-panel="segments" hidden>
+        <div class="pp-top">
+          <p>{pick(pilots.segments.intro, lang)}</p>
+          <span class="badge-demo">{pick(ui.demoBadge, lang)}</span>
+        </div>
+        <div class="seg-grid">
+          <div class="seg-canvas-wrap">
+            <canvas data-seg-canvas aria-label="k-means scatter" role="img"></canvas>
+            <span class="axis ax-x mono">{pick(pilots.segments.xAxis, lang)} →</span>
+            <span class="axis ax-y mono">↑ {pick(pilots.segments.yAxis, lang)}</span>
+          </div>
+          <div class="seg-side">
+            <div class="seg-ctl">
+              <span class="mono">{pick(pilots.segments.k, lang)}</span>
+              <div class="seg-k" role="group">
+                {[3, 4, 5].map((k) => <button type="button" class="chip" data-k={k} aria-pressed={k === 4 ? 'true' : 'false'}>{k}</button>)}
+              </div>
+              <button type="button" class="chip" data-seg-rerun>↻ {pick(pilots.segments.rerun, lang)}</button>
+            </div>
+            <div class="seg-iter mono" data-seg-iter></div>
+            <ul class="seg-list" data-seg-list></ul>
+          </div>
+        </div>
+        <p class="measure"><b class="mono">{pick(measureLabel, lang)}</b>{pick(pilots.segments.measure, lang)}</p>
+      </div>
+
+      <!-- 3. Kitchen -->
+      <div class="pilot-panel" role="tabpanel" id="pp-kitchen" aria-labelledby="pilot-kitchen" data-pilot-panel="kitchen" hidden>
+        <div class="pp-top">
+          <p>{pick(pilots.kitchen.intro, lang)}</p>
+          <span class="badge-demo">{pick(ui.demoBadge, lang)}</span>
+        </div>
+        <div class="kit-ctl">
+          <label for="cooks" class="mono">{pick(pilots.kitchen.cooks, lang)}: <b data-cooks-val>4</b></label>
+          <input id="cooks" type="range" min="3" max="8" value="4" data-cooks />
+        </div>
+        <div class="kit-chart" data-kit-chart></div>
+        <div class="kit-alert" data-kit-alert aria-live="polite"></div>
+        <p class="measure"><b class="mono">{pick(measureLabel, lang)}</b>{pick(pilots.kitchen.measure, lang)}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pilot-shell { overflow: hidden; }
+  .pilot-tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+  .pilot-tabs button {
+    display: flex; align-items: center; gap: 10px; padding: 18px 22px; background: none; border: 0;
+    border-right: 1px solid var(--line); cursor: pointer; font-weight: 600; font-size: 15.5px; text-align: left;
+    color: var(--ink-2); position: relative; transition: color 0.2s, background 0.2s;
+  }
+  .pilot-tabs button:last-child { border-right: 0; }
+  .pilot-tabs button::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); transform: scaleX(0); transition: transform 0.3s; }
+  .pilot-tabs button[aria-selected='true'] { color: var(--ink); background: var(--panel-2); }
+  .pilot-tabs button[aria-selected='true']::after { transform: none; }
+  .pilot-tabs svg { color: var(--accent); flex: none; }
+  .pt-n { color: var(--muted); font-size: 12px; font-weight: 400; }
+  .pilot-panel { padding: clamp(18px, 3vw, 32px); animation: pop 0.35s ease; }
+  @keyframes pop { from { opacity: 0; } }
+  .pp-top { display: flex; justify-content: space-between; gap: 18px; align-items: start; }
+  .pp-top p { margin: 0; color: var(--ink-2); max-width: 70ch; }
+  .pp-top .badge-demo { flex: none; }
+
+  .ask { display: flex; gap: 10px; margin-top: 22px; }
+  .ask input { flex: 1; min-width: 0; padding: 14px 18px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--ink); font: inherit; }
+  .ask input:focus { outline: none; border-color: var(--accent); }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .presets .chip { cursor: pointer; white-space: normal; text-align: left; }
+  .presets .chip:hover { border-color: var(--accent); }
+  .ask-out { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; margin-top: 22px; }
+  .ask-trace { list-style: none; margin: 0; padding: 16px; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--line); font-size: 12.5px; display: grid; gap: 8px; min-height: 220px; align-content: start; overflow-wrap: anywhere; }
+  .ask-trace :global(li) { display: grid; grid-template-columns: 48px 1fr; gap: 8px; animation: pop 0.3s ease; }
+  .ask-trace :global(.k) { color: var(--muted); }
+  .ask-trace :global(.k-tool) { color: var(--warn); }
+  .ask-trace :global(.k-rows) { color: var(--ink-2); }
+  .ask-trace :global(.k-check) { color: var(--ok); }
+  .ask-trace :global(.k-plan) { color: var(--accent); }
+  .ask-answer { padding: 20px; border-radius: 14px; border: 1px solid var(--accent); background: var(--accent-soft); align-self: start; animation: pop 0.4s ease; }
+  .ask-answer p { margin: 0 0 12px; }
+  .ask-src { font-size: 13px; color: var(--ink-2); }
+  .ask-src .mono { color: var(--accent); }
+  .ask-fb { display: flex; gap: 8px; margin-top: 12px; }
+  .ask-fb span { padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line-2); font-size: 14px; }
+
+  .measure { margin: 24px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px dashed var(--line-2); color: var(--ink-2); font-size: 14.5px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .measure b { color: var(--hot); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+
+  .seg-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; margin-top: 22px; }
+  .seg-canvas-wrap { position: relative; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--line); aspect-ratio: 4 / 3; overflow: hidden; }
+  .seg-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+  .axis { position: absolute; font-size: 11px; color: var(--muted); }
+  .ax-x { right: 12px; bottom: 8px; }
+  .ax-y { left: 12px; top: 8px; }
+  .seg-ctl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .seg-k { display: flex; gap: 6px; }
+  .seg-ctl .chip { cursor: pointer; }
+  .seg-ctl .chip[aria-pressed='true'] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .seg-iter { font-size: 12px; color: var(--muted); margin: 12px 0; min-height: 18px; }
+  .seg-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .seg-list :global(li) { padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); border-left: 4px solid var(--c); animation: pop 0.4s ease; }
+  .seg-list :global(.sn) { font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+  .seg-list :global(.sn small) { font-family: var(--mono); color: var(--muted); font-weight: 400; }
+  .seg-list :global(.so) { font-size: 13.5px; color: var(--ink-2); margin-top: 4px; }
+
+  .kit-ctl { display: flex; align-items: center; gap: 16px; margin-top: 22px; flex-wrap: wrap; }
+  .kit-ctl label { font-size: 14px; }
+  .kit-ctl b { color: var(--accent); font-size: 18px; }
+  .kit-ctl input { flex: 1; max-width: 340px; accent-color: var(--accent); }
+  .kit-chart { margin-top: 16px; }
+  .kit-chart :global(svg) { width: 100%; height: auto; display: block; }
+  .kit-alert { margin-top: 14px; }
+  .kit-alert :global(.alert) { padding: 16px 18px; border-radius: 12px; border: 1px solid var(--hot); background: var(--hot-soft); display: grid; gap: 4px; animation: pop 0.3s ease; }
+  .kit-alert :global(.alert.ok) { border-color: var(--ok); background: color-mix(in oklab, var(--ok) 12%, transparent); }
+  .kit-alert :global(.alert b) { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  @media (max-width: 900px) {
+    .pilot-tabs { grid-template-columns: 1fr; }
+    .pilot-tabs button { border-right: 0; border-bottom: 1px solid var(--line); }
+    .ask-out, .seg-grid { grid-template-columns: 1fr; }
+    .pp-top { flex-direction: column; }
+  }
+  @media (max-width: 520px) { .ask { flex-direction: column; } }
+</style>

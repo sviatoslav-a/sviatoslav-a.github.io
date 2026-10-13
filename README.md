@@ -14,7 +14,7 @@
 - Три демо: поиск по данным ERP, группировка гостей и расчёт загрузки кухни. Данные в них вымышленные.
 - Поиск по сайту через ⌘K, русский и английский языки, светлая и тёмная темы.
 
-Вторая часть задания: [Scout, поиск поставщиков](https://github.com/sviatoslav-a/food-suppliers).
+Вторая часть задания: [Scout, поиск поставщиков](https://sviatoslav-a.github.io/food-suppliers/) ([исходники](https://github.com/sviatoslav-a/food-suppliers)).
 
 ## Запуск
 

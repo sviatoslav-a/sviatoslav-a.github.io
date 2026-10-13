@@ -213,6 +213,31 @@ test('no em or en dashes anywhere in visible copy', async ({ page }) => {
   }
 });
 
+test('halftone portrait is decorative, loads in both themes and does not intercept clicks', async ({ page, request }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/');
+  const portrait = page.locator('.portrait');
+  await expect(portrait).toHaveAttribute('aria-hidden', 'true');
+  expect(await portrait.evaluate(el => getComputedStyle(el).pointerEvents)).toBe('none');
+  expect(await page.locator('.portrait-ink').evaluate(el => getComputedStyle(el).maskImage)).toContain('portrait-dark.webp');
+  await page.locator('[data-theme-toggle]').click();
+  expect(await page.locator('.portrait-ink').evaluate(el => getComputedStyle(el).maskImage)).toContain('portrait-light.webp');
+  for (const theme of ['light', 'dark']) {
+    const response = await request.get(`/images/portrait-${theme}.webp`);
+    expect(response.ok()).toBeTruthy();
+    expect(response.headers()['content-type']).toContain('image/webp');
+  }
+  await page.locator('.hero .cta a[href="#fit"]').click();
+  await expect(page.locator('#fit h2')).toBeInViewport();
+});
+
+test('publication metadata and source link point to the correct GitHub account', async ({ page }) => {
+  await page.goto('/en/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sviatoslav-a.github.io/en/');
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://sviatoslav-a.github.io/og.png');
+  await expect(page.locator('a[href="https://github.com/sviatoslav-a/sviatoslav-a.github.io"]')).toHaveCount(1);
+});
+
 test('unknown route serves the 404 page', async ({ page }) => {
   const r = await page.goto('/nope');
   expect(r?.status()).toBe(404);

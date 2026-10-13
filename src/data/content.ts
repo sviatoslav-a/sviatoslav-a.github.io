@@ -460,8 +460,8 @@ export const cases: CaseItem[] = [
 export const pilots = {
   title: { ru: 'Три пилота для вашей ERP', en: 'Three pilots for your ERP' },
   lead: {
-    ru: 'На HR-интервью я узнал, что владельцы ресторанов просят умный поиск, рекомендации вместо отчётов и подсветку рисков на кухне, а первый фокус команды: маркетинг и производительность кухни. Вот как я бы начал. Всё ниже работает в браузере на синтетических данных.',
-    en: 'On the HR call I learned that restaurant owners ask for smart search, recommendations instead of reports and kitchen risk alerts, and that the team starts with marketing and kitchen performance. Here is how I would start. Everything below runs in your browser on synthetic data.',
+    ru: 'Три направления, с которых я бы начал AI-пилоты в ресторанной ERP: поиск по данным, сегментация гостей и риски загрузки кухни. Это мои предложения, не описание внутренних планов компании. Всё ниже работает в браузере на синтетических данных.',
+    en: 'Three starting points I would propose for AI pilots in a restaurant ERP: data search, guest segmentation and kitchen load risks. These are my proposals, not a description of internal company plans. Everything below runs in your browser on synthetic data.',
   },
   tabs: {
     search: { ru: 'Умный поиск по ERP', en: 'Smart ERP search' },

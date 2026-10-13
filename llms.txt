@@ -1,0 +1,117 @@
+# Sviatoslav Alekseev - AI engineer / AI Automation
+
+> 8+ years in engineering. Lately I build LLM agents, integrations and automation in products with real users and real money. I find the process, design the solution, ship it and measure the effect.
+
+Contacts: Telegram @zotho · sviatoslav.alekseev@proton.me · github.com/zotho · Yekaterinburg
+Russian version of the site: /  ·  English: /en/
+
+## Vacancy requirements → evidence (hh.ru/vacancy/137989678)
+- **Find processes worth automating with AI** [in production]: At Askloyal I saw customers moving idle USDC between protocols by hand and turned it into an automatic orchestrator. Turned my own job search into a pipeline: a Chrome extension, Google Sheets API, scoring and a desktop widget.
+- **Assistants, agents, chatbots** [in production]: A finance LLM agent with guardrails: it proposes actions but cannot execute unsafe ones itself. A daily summary bot for finance Telegram chats with user voting. Writing my own agent harness in Rust (pi-rs): providers, tools, context compaction.
+- **Integrations with internal systems and APIs** [in production]: Askloyal B2B partner integrations, RPC and DeFi protocols, Telegram Bot API. Google Sheets API with atomic writes and read-back checks, Chrome native messaging.
+- **Adopt and adapt off-the-shelf AI tools** [in production]: Daily work with Codex, Claude Code and Pi; I tune them per project with AGENTS.md, skills and MCP servers. Built a macOS widget that tracks Codex and Claude limits across several accounts.
+- **Run and validate pilots** [in production]: An agent-led Rust to Go planner rewrite was checked with a harness: fixtures, disposable PostgreSQL, mutation controls. 154/154 scenarios matched.
+- **Measure the impact** [in production]: After a release I watch metrics and regressions; ClickStack alerts reach Telegram with deduplication. In the summary bot users vote on quality, and the prompt changes based on that data.
+- **Teach teams to use AI** [in projects]: At QF Network I was the AI Practices Evangelist: I maintained the project context for the whole team's LLM agents. I write AGENTS.md files and agent rules in repos so the whole team gets consistent results.
+- **Own the architecture through launch** [in production]: Deposit orchestrator: workers, retries, idempotency, reconciliation, monitoring. Launched in July, 2000 users in the first week.
+- **Python** [in production]: 7+ years: Django/DRF at RingCentral, a vulnerability scanner at Scalescan, a road analytics backend, FastAPI services, the vacancy pipeline.
+- **SQL** [in production]: PostgreSQL, PostGIS, TimescaleDB. My PostGIS polygon-filling method was adopted by an AIS system. A job queue on Postgres, disposable databases in tests.
+- **LLMs in a product** [in production]: An LLM agent and LLM summaries in a product with 8000 users. Local models via Ollama and llama.cpp for private data.
+- **RAG and knowledge-base search** [in projects]: Qwen3 embeddings and clustering of 3600 vacancies; ranking by similarity to past applications. The search on this site (⌘K) works as a RAG retrieval layer right in the browser.
+- **MCP** [in projects]: I connect MCP servers to agents at work: the task tracker, call transcripts, shared search over team history. In part two of the test task I expose the supplier data through an MCP server so any agent can use it.
+- **LangChain / LangGraph** [closing the gap]: I write agent loops myself: state, tools, checkpoints, retries. That is the same model as a LangGraph state graph, so moving to your stack is quick.
+- **Vector databases** [closing the gap]: I have done embeddings, nearest-neighbour search and clustering in my own projects. A dedicated vector DB (pgvector) goes into the supplier demo in part two.
+- **Document processing: receipts, waybills** [in projects]: The offline Slip app: receipt photo → Russian and English OCR → human review → reports. E2E tests on an emulator.
+
+## Projects
+
+### Finance AI agent and deposit orchestrator (Askloyal · B2C → B2B, 2026)
+- Problem: Users kept dollars idle and decided by hand where to move them for yield. Slow, risky, and it does not scale to B2B partners.
+- Built: An orchestrator that spreads deposits across pools for the best yield: up to 17% APY versus 7% in a regular bank, with no FX risk.
+- Built: An LLM agent that proposes financial actions. Guardrails: it executes only what we marked safe, everything else needs confirmation.
+- Built: Reliability: workers, retries, idempotency, daily reconciliation, alerts.
+- Built: Integrations with B2B partners who bring their own customers.
+- Result: Launched in July, 2000 users in the first week, now 8000 users and $600k AUM. The code is open on GitHub.
+- Stack: Rust, Go, TypeScript, PostgreSQL, ClickStack, LLM agent, Solana
+- Link: https://github.com/loyal-labs/loyal-app
+
+### Telegram chat summaries that learn from votes (Askloyal · LLM in the product, 2026)
+- Problem: Finance chats get hundreds of messages a day. People miss what matters, and nobody will write a digest by hand.
+- Built: A bot posts a daily or weekly summary into each chat, with an image.
+- Built: Members vote summaries up or down. Votes become a dataset that drives prompt changes: an auto-research loop.
+- Result: This maps directly to your needs: regular digests, reports and personalized messaging with a feedback loop.
+- Stack: TypeScript, Telegram Bot API, LLM, image generation
+
+### Rewrote a service with agents and proved nothing broke (Askloyal · Rust → Go, 2026)
+- Problem: The planner and revalidator had to move from Rust to Go. Agents write the code, so we needed a check we can trust, not "seems to work".
+- Built: The old Rust code became the reference. Both versions get the same inputs and are compared on exact output.
+- Built: Fixtures, disposable PostgreSQL, mutation controls: the harness catches skipped, duplicated and fabricated agent "successes".
+- Result: 154 of 154 scenarios matched. This is how I would run AI pilots for you: success criteria first, code second.
+- Stack: Go, Rust, PostgreSQL, differential testing
+
+### Automated my own job search (Personal project · end to end, 2026)
+- Problem: Vacancies on HH, Habr Career, LinkedIn and Himalayas, applications, chats, statuses. By hand that is hours a day, and things get lost.
+- Built: A Chrome extension (MV3) collects vacancies and chats in my own browser profile, paced so it never hammers the sites.
+- Built: Native messaging → Python → Google Sheets API: one atomic write, a concurrent-edit check, read-back verification.
+- Built: Profile-based scoring, an HTML dashboard and a macOS widget: one button runs the whole thing.
+- Built: Guardrails: it never submits applications by itself and stops at any captcha.
+- Result: 3604 vacancies collected and ranked automatically. That is how I found your vacancy.
+- Stack: Python, Chrome MV3, Google Sheets API, Swift / WidgetKit, Codex, Pi
+
+### Semantic vacancy atlas (Embeddings · local models, 2026)
+- Problem: Keywords can't tell "AI engineer" from "AI marketer". You need search by meaning.
+- Built: Qwen3 embeddings via Ollama, run locally with no data leaving the machine.
+- Built: UMAP and HDBSCAN lay out vacancies on a 3D cluster map.
+- Built: Final score: 60% profile rules plus 40% similarity to vacancies I already applied to.
+- Result: The same approach works for smart search in your ERP: meaning, not exact word match.
+- Stack: Python, Ollama, Qwen3 embeddings, UMAP, HDBSCAN
+
+### Slip: receipt recognition (Android · offline, 2026)
+- Problem: Receipts and waybills arrive as photos. Retyping line items is slow and errors break the reports.
+- Built: Photo → Russian and English OCR → a review screen where a person fixes items → SQLite.
+- Built: SHA-256 dedup, weekly, monthly and category reports, export.
+- Built: Built by an agent in a day, with E2E tests on an emulator.
+- Result: A template for your invoices and waybills: recognize, let a person verify, store the structure.
+- Stack: Android, ML Kit, Tesseract, SQLite, E2E tests
+
+### My own tools for agents (pi-rs · Pi Remote · usage widget, 2026)
+- Problem: Off-the-shelf agents are good, but each project needs them tuned, and sometimes rewritten.
+- Built: pi-rs: an agent harness in Rust with model providers, tools, context compaction and a TUI.
+- Built: Pi Remote: an Android client that drives agents on several machines, with end-to-end encryption.
+- Built: A macOS widget that shows remaining Codex and Claude limits per account.
+- Result: I understand agents from the inside: why they lose context, how to restrict tools and how to check their work.
+- Stack: Rust, TypeScript, Python, Android, Swift, MCP
+
+### Noise-free alerts in Telegram (Askloyal · internal tool, 2026)
+- Problem: Monitoring alerts either get lost or flood the chat with duplicates.
+- Built: A ClickStack → Telegram relay: dedup by eventId and a one-hour cooldown.
+- Result: The team sees every incident once, right away.
+- Stack: TypeScript, ClickStack, Telegram Bot API
+
+## Pilots proposed for the Goulash ERP (synthetic demos on the site)
+- Smart ERP search: The owner asks in plain words. The agent picks tools, queries ERP data and answers with sources. How to measure: share of questions answered without a support call; time to answer; 👍/👎 under every answer. Pilot: 5 venues, 2 weeks.
+- Guest auto-segmentation: K-means runs right here on 600 synthetic guests by order frequency and average check. An LLM then names segments and writes a personal offer. How to measure: A/B against the current campaign, conversion to order and revenue per recipient. 10% holdout.
+- Kitchen load risks: Hourly order forecast against kitchen capacity. Move the cooks slider: overloaded hours light up and the agent writes an alert for the manager. How to measure: late orders and ticket time in hours where the alert fired versus similar hours without it.
+
+## How I work
+1. Talk to people: First understand how the process works today and where it hurts. At my first job the users of my tool sat next door, the best feedback loop there is.
+2. Success criteria: A metric and a check before code: what counts as success, on which data, and how we will notice a regression.
+3. Simple first: The simplest version that delivers value. Then improve based on feedback, not the other way round.
+4. Agents + harness: I write code with agents in an implement/verify loop. The harness rejects fabricated "done".
+5. Guardrails: The agent can only do what is safe. Money, outgoing messages and deletions go through a person.
+6. Ship and measure: Monitoring, alerts, A/B. Keep what worked and scale it.
+
+## Experience
+- 2024 - now · Askloyal · Senior Software Engineer, AI/ML: LLM agent, deposit orchestrator, B2B integrations, load, databases, monitoring, mainnet deploys. Open source.
+- 2025 · QF Network · Consensus architecture, AI Practices Evangelist: Designed SPIN consensus: 100 ms blocks on testnet. Led the team's practices for working with LLM agents.
+- 2022 - 2024 · Redsteep · Senior Blockchain Developer: Projects for many clients from scratch: DEX, bridge, multisig, LLM tools, AI code review. This is where agents started for me.
+- 2019 - 2022 · Skyroads (Munich) · Full Stack Developer: Software for a flying taxi: async services, UDP, Codec2 voice links, PostGIS and TimescaleDB.
+- 2016 - 2021 · RingCentral · Scalescan · Road Consulting · Python backend / full stack: Django and Kubernetes at RingCentral, a SaaS vulnerability scanner, internal road analytics in Yekaterinburg: panoramas, markings, PostGIS.
+- Bauman Moscow State Technical University, Mechatronics and Robotics, 2016-2020 · Technopark Mail.ru, C/C++
+- Open source: ebur128 (performance), dotenv-linter, der-parser, macroquad
+
+## Stack
+- Languages: Python, Rust, TypeScript, Go, SQL
+- AI: LLM agents, tool calling, MCP, RAG, embeddings, Ollama, Codex, Claude Code, evals
+- Data: PostgreSQL, PostGIS, TimescaleDB, SQLite, ClickStack
+- Infra: Docker, Kubernetes, GitHub Actions, AWS, GCP, Vercel

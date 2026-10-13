@@ -74,9 +74,10 @@ try {
   if (errors.length) throw new Error(errors.join('\n'));
   const path = await video.path();
   const ffmpeg = args => execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...args], { stdio: 'inherit' });
-  ffmpeg(['-ss', '0.5', '-i', path, '-an', '-vf', 'fps=30,scale=1280:-2', '-c:v', 'libx264', '-preset', 'medium', '-crf', '24', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', `${output}/portfolio-demo.mp4`]);
-  // Compact animated preview; full recording remains available as MP4.
-  ffmpeg(['-i', `${output}/portfolio-demo.mp4`, '-t', '18', '-filter_complex', '[0:v]fps=6,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=64[p];[b][p]paletteuse=dither=bayer:bayer_scale=3', '-loop', '0', `${output}/portfolio-demo.gif`]);
+  ffmpeg(['-ss', '0.5', '-i', path, '-an', '-vf', 'fps=30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '20', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', `${output}/portfolio-demo.mp4`]);
+  // Match pii-gateway's readable 1200px/10fps/no-dither settings. Keep the GIF
+  // excerpt short rather than reducing resolution; the MP4 has the full tour.
+  ffmpeg(['-i', `${output}/portfolio-demo.mp4`, '-t', '18', '-filter_complex', '[0:v]fps=10,scale=1200:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=none', '-loop', '0', `${output}/portfolio-demo.gif`]);
   console.log(`Demo: ${output}/portfolio-demo.mp4 (and GIF/PNG preview)`);
 } finally {
   await browser?.close();

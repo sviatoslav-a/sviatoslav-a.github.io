@@ -6,7 +6,8 @@ import { mkdir } from 'node:fs/promises';
 
 const input = process.argv[2];
 if (!input) throw new Error('Pass the source portrait path');
-const width = 880, height = 980, step = 5;
+// A generous gap between dots keeps the portrait visibly stippled at CSS size.
+const width = 880, height = 980, step = 9;
 const pixels = await sharp(input).rotate()
   .extract({ left: 550, top: 320, width: 2200, height: 2450 })
   .resize(width, height).greyscale().raw().toBuffer();
@@ -34,7 +35,7 @@ for (const theme of ['dark', 'light']) {
       if (background[i]) continue;
       const tone = Math.max(0, Math.min(1, (pixels[i] / 255 - .22) / .62));
       const density = theme === 'dark' ? tone ** 1.8 : (1 - tone) ** .85;
-      const r = 2.25 * Math.sqrt(density);
+      const r = 3 * Math.sqrt(density);
       if (r < .25) continue;
       circles.push(`<circle cx="${x}" cy="${y}" r="${r.toFixed(2)}"/>`);
     }

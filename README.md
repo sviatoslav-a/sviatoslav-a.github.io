@@ -76,7 +76,11 @@ npm run dev        # http://localhost:4321
 npm test           # unit + build + e2e
 ```
 
-Требуется Node 22.19+. Проверено: 11 unit-тестов и 50 E2E-проверок (desktop + Pixel 7, RU/EN, обе темы, axe).
+Требуется Node 22.19+. Проверено: 11 unit-тестов и 50 E2E-проверок (desktop + Pixel 7, RU/EN, обе темы, axe). Все 50 E2E также пройдены на опубликованном GitHub Pages сайте.
+
+```sh
+PLAYWRIGHT_BASE_URL=https://sviatoslav-a.github.io npm run test:e2e
+```
 
 ## Фото и оформление
 

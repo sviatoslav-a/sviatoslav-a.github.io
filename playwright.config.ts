@@ -4,8 +4,8 @@ export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
   reporter: [['list']],
-  use: { baseURL: 'http://localhost:4329', trace: 'retain-on-failure' },
-  webServer: {
+  use: { baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4329', trace: 'retain-on-failure' },
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     command: 'npx astro preview --port 4329 --ignore-lock',
     url: 'http://localhost:4329',
     reuseExistingServer: false,

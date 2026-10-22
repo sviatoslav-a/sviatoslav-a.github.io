@@ -52,6 +52,7 @@ export class VdoCall extends EventTarget {
       if (detail.streamID) view(detail.streamID);
     });
     vdo.addEventListener('streamAdded', ({ detail }) => view(detail.streamID));
+    vdo.addEventListener('peerConnected', ({ detail }) => this.emit('present', detail.uuid));
     vdo.addEventListener('track', ({ detail }) => {
       const track = new Track(detail.track, detail.uuid);
       const key = detail.uuid + ':' + detail.track.kind;
@@ -91,6 +92,63 @@ export class VdoCall extends EventTarget {
     if (!track) track = await this.acquire(kind);
     else track.track.enabled = !track.track.enabled;
     this.sendMute(); return track;
+  }
+  get cameraFacing() {
+    return this.local.get('video')?.track.getSettings().facingMode || this.selectedFacing || 'user';
+  }
+  async canSwitchCamera() {
+    if (!this.local.has('video') || this.closed) return false;
+    try { return (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput').length > 1; }
+    catch { return false; }
+  }
+  async switchCamera() {
+    if (this.switching || this.closed) return null;
+    const old = this.local.get('video');
+    if (!old) return null;
+    const devices = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+    if (devices.length < 2) return old;
+    this.switching = true;
+    const settings = old.track.getSettings();
+    const current = devices.findIndex(d => d.deviceId === settings.deviceId);
+    const next = devices[(current + 1) % devices.length];
+    const enabled = old.track.enabled;
+    const capture = async deviceId => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } } });
+      return stream.getVideoTracks()[0];
+    };
+    let replacement;
+    const install = async raw => {
+      if (this.closed) { raw.stop(); return null; }
+      raw.enabled = enabled;
+      // The previous camera must release hardware before another can open on phones.
+      if (this.vdo?.state.publishing) {
+        await this.vdo.replaceTrack(old.track, raw);
+        for (const connections of this.vdo.connections.values()) {
+          for (const sender of connections.publisher?.pc.getSenders() || []) {
+            if (sender.track?.kind === 'video' && sender.track !== raw) await sender.replaceTrack(raw);
+          }
+        }
+      }
+      if (this.closed) { raw.stop(); return null; }
+      const track = new Track(raw); this.local.set('video', track);
+      raw.addEventListener('ended', () => { track.update(true); this.emit('stopped', 'video'); });
+      this.sendMute(); return track;
+    };
+    old.track.stop();
+    try {
+      replacement = await capture(next.deviceId);
+      const track = await install(replacement);
+      this.selectedFacing = /back|rear|environment/i.test(next.label) ? 'environment' : 'user';
+      return track;
+    } catch (error) {
+      replacement?.stop();
+      // Restore the original camera if the requested device is unavailable.
+      if (!this.closed) {
+        try { await install(await capture(settings.deviceId)); }
+        catch { this.local.delete('video'); this.emit('stopped', 'video'); }
+      }
+      throw error;
+    } finally { this.switching = false; }
   }
   async end() {
     if (this.closed) return;

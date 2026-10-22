@@ -8,3 +8,11 @@
 - Portfolio regression checks: all 50 browser tests passed after adding /call/.
 
 The four skipped checks require real Safari media capture. WebKit layout and crypto checks do not establish physical iPhone call compatibility. These checks are not an independent security audit or a load/uptime test.
+
+## Public deployment
+
+Published at https://sviatoslav-a.github.io/call/. Compared SHA-256 hashes of the served HTML, app, adapter, authentication module and SDK with the tested files; all matched.
+
+The physical Pixel 8 then loaded the public site directly and exchanged generated audio/video with desktop Chromium in automatic and forced-TURN modes. Both modes passed certificate endpoint matching, camera toggle and hangup checks with no page errors. No ADB reverse proxy was used for these production calls. The Pixel reported a Polish public IP during this run, despite having reported a Russian IP in the earlier infrastructure probe. This is a Polish-network production check; the earlier Russian result is separate evidence. No new France call test was performed.
+
+Chrome was closed on the Pixel after the test. The dedicated emulator and Jitsi VM were stopped after verification.

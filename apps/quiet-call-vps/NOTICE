@@ -1,0 +1,12 @@
+Quiet call custom frontend
+Copyright 2026
+Licensed under the Apache License, Version 2.0.
+
+Uses lib-jitsi-meet and official Jitsi Docker images, release stable-11248.
+The SDK is served by the Jitsi web container and is not copied into this repository.
+
+deploy/upstream/docker-compose.yml and deploy/upstream/LICENSE were retrieved from:
+https://github.com/jitsi/docker-jitsi-meet/tree/stable-11248
+Retrieved on 2026-10-22.
+
+Jitsi and its components retain their original copyright and license notices.

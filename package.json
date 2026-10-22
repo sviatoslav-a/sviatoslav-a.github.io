@@ -16,7 +16,9 @@
     "test": "npm run test:unit && npm run build && npm run test:e2e",
     "og": "node tools/og.mjs",
     "demo": "node tools/record_demo.mjs",
-    "deploy:pages": "npm run build && node tools/deploy-pages.mjs"
+    "deploy:pages": "npm run build && node tools/deploy-pages.mjs",
+    "test:call": "playwright test -c playwright.call.config.js",
+    "dev:call": "python3 -m http.server 4187 --directory public/call"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",

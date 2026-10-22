@@ -64,3 +64,16 @@ npm run deploy:pages
 ```
 
 В Settings → Pages выбрана ветка `gh-pages`, папка `/`. Скрипт собирает сайт и обновляет эту ветку, не переключая рабочую копию.
+
+
+## Quiet call
+
+The portfolio stays at `/`. The static calling app is at [/call/](https://sviatoslav-a.github.io/call/).
+
+- `public/call/`: GitHub Pages version using the pinned VDO.Ninja SDK with authenticated signalling and browser-to-browser encrypted media. See [its README](public/call/README.md).
+- `apps/quiet-call-vps/`: separate original Jitsi Docker application for a server you control. It has its own setup, tests and license. It does not use VDO.Ninja or claim E2EE through Jitsi's bridge.
+- `npm run dev:call`: serve the static app on port 4187.
+- `npm run test:call`: run its browser and privacy tests while that server is running.
+- `npm run deploy:pages`: build and publish the whole portfolio plus `/call/` using the existing gh-authenticated deployment script.
+
+VDO.Ninja public infrastructure needs no account or room provisioning. The VPS package generates its own secrets on the destination server. Never publish its `.env` or `.runtime` directories.

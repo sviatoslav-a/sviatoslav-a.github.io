@@ -1,0 +1,5 @@
+services:
+  web:
+    volumes:
+      - ${APP_DIR}/public/index.html:/usr/share/jitsi-meet/index.html:ro
+      - ${APP_DIR}/public:/usr/share/jitsi-meet/static/quiet:ro

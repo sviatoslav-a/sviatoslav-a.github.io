@@ -1,0 +1,13 @@
+{
+  "name": "quiet-call",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "setup": "node scripts/setup.mjs",
+    "check": "node --check public/app.js && node --check public/jitsi.js && node --check scripts/setup.mjs",
+    "test": "playwright test"
+  },
+  "devDependencies": { "@playwright/test": "1.64.1" }
+}

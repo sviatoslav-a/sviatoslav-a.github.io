@@ -1,0 +1,9 @@
+{$CALL_DOMAIN} {
+  header {
+    Referrer-Policy "no-referrer"
+    X-Content-Type-Options "nosniff"
+    Permissions-Policy "camera=(self), microphone=(self), geolocation=()"
+    Content-Security-Policy "frame-ancestors 'none'"
+  }
+  reverse_proxy web:8000
+}

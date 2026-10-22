@@ -1,0 +1,18 @@
+services:
+  caddy:
+    image: docker.io/library/caddy:2.10.2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      - CALL_DOMAIN=${CALL_DOMAIN:?Set CALL_DOMAIN in .env}
+    volumes:
+      - ${APP_DIR}/deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      meet.jitsi:
+volumes:
+  caddy_data:
+  caddy_config:

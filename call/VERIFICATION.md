@@ -16,3 +16,7 @@ Published at https://sviatoslav-a.github.io/call/. Compared SHA-256 hashes of th
 The physical Pixel 8 then loaded the public site directly and exchanged generated audio/video with desktop Chromium in automatic and forced-TURN modes. Both modes passed certificate endpoint matching, camera toggle and hangup checks with no page errors. No ADB reverse proxy was used for these production calls. The Pixel reported a Polish public IP during this run, despite having reported a Russian IP in the earlier infrastructure probe. This is a Polish-network production check; the earlier Russian result is separate evidence. No new France call test was performed.
 
 Chrome was closed on the Pixel after the test. The dedicated emulator and Jitsi VM were stopped after verification.
+
+## Camera and participant update, 23 October 2026
+
+27 checks passed, 6 physical-Safari or Chromium-capture checks skipped. Added camera switching with mute preservation and capture-failure recovery, plus receive-only participant visibility. Android emulator camera settings changed from user to environment and back, with decoded remote frames continuing after both switches. A camera switch while muted remained muted. Pixel 8 was not used for this update.

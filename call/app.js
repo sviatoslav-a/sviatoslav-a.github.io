@@ -1,4 +1,4 @@
-import { VdoCall, invitation } from './vdo.js';
+import { VdoCall, invitation } from './vdo.js?v=20261023-camera';
 
 const $ = id => document.getElementById(id);
 const locale = (navigator.languages?.[0] || navigator.language || 'en').toLowerCase().startsWith('ru') ? 'ru' : 'en';
@@ -11,7 +11,7 @@ const strings = {
     missingAudio: 'No microphone found. Connect one and try again.', missingVideo: 'No camera found. Connect one and try again.',
     busyAudio: 'Microphone is in use. Close the other app and try again.', busyVideo: 'Camera is in use. Close the other app and try again.',
     failed: 'Could not turn it on. Try again.', skipVideo: 'Continue without camera', skipAudio: 'Continue without microphone',
-    mute: 'Turn microphone off', unmute: 'Turn microphone on', cameraOff: 'Turn camera off', cameraOn: 'Turn camera on',
+    mute: 'Turn microphone off', unmute: 'Turn microphone on', cameraOff: 'Turn camera off', cameraOn: 'Turn camera on', switchCamera: 'Switch camera',
     end: 'End call', share: 'Copy call link', copied: 'Link copied', retry: 'Try again',
     connecting: 'Connecting…', disconnected: 'Connection lost.', server: 'Cannot connect to the call.',
     play: 'Tap to hear the call', rejoin: 'Call again', link: 'Call link', copy: 'Copy link', close: 'Close',
@@ -25,7 +25,7 @@ const strings = {
     missingAudio: 'Микрофон не найден. Подключите его и попробуйте снова.', missingVideo: 'Камера не найдена. Подключите её и попробуйте снова.',
     busyAudio: 'Микрофон занят. Закройте другое приложение и попробуйте снова.', busyVideo: 'Камера занята. Закройте другое приложение и попробуйте снова.',
     failed: 'Не удалось включить. Попробуйте снова.', skipVideo: 'Продолжить без камеры', skipAudio: 'Продолжить без микрофона',
-    mute: 'Выключить микрофон', unmute: 'Включить микрофон', cameraOff: 'Выключить камеру', cameraOn: 'Включить камеру',
+    mute: 'Выключить микрофон', unmute: 'Включить микрофон', cameraOff: 'Выключить камеру', cameraOn: 'Включить камеру', switchCamera: 'Сменить камеру',
     end: 'Завершить звонок', share: 'Скопировать ссылку', copied: 'Ссылка скопирована', retry: 'Повторить',
     connecting: 'Подключение…', disconnected: 'Связь прервалась.', server: 'Не удалось подключиться к звонку.',
     play: 'Нажмите, чтобы включить звук', rejoin: 'Позвонить снова', link: 'Ссылка на звонок', copy: 'Скопировать', close: 'Закрыть',
@@ -43,6 +43,7 @@ const paths = {
   'mic-off': '<path d="m3 3 18 18M9 9v3a3 3 0 0 0 5 2M9 5a3 3 0 0 1 6 0v6M5 10v2a7 7 0 0 0 12 5m2-5v-2M12 19v3m-4 0h8"/>',
   camera: '<rect x="3" y="5" width="12" height="14" rx="3"/><path d="m15 9 6-4v14l-6-4"/>',
   'camera-off': '<path d="m3 3 18 18M15 9l6-4v11M10 5h2a3 3 0 0 1 3 3v2M4 6a3 3 0 0 0-1 2v8a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3"/>',
+  'switch-camera': '<path d="M4 8a9 9 0 0 1 15-2l2 2M21 3v5h-5M20 16a9 9 0 0 1-15 2l-2-2M3 21v-5h5"/>',
   hangup: '<path d="M3 15v-4c5-5 13-5 18 0v4l-5-1v-3a12 12 0 0 0-8 0v3z"/>',
   link: '<path d="m10 13 4-4m-6 6-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m4 2 2-2a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" transform="translate(1 0)"/>',
   check: '<path d="m5 12 4 4L19 6"/>', close: '<path d="m6 6 12 12M18 6 6 18"/>',
@@ -52,6 +53,7 @@ const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name]}
 for (const el of document.querySelectorAll('[data-icon]')) el.innerHTML = icon(el.dataset.icon);
 const label = (el, text) => { el.setAttribute('aria-label', text); el.title = text; };
 for (const kind of ['audio', 'video']) $('allow-' + kind).querySelector('.permission-label').textContent = t[kind];
+label($('switch-camera'), t.switchCamera);
 label($('share'), t.share); label($('hangup'), t.end); label($('close-share'), t.close);
 $('play').textContent = t.play; $('rejoin').textContent = t.rejoin; $('retry').textContent = t.retry;
 $('link-label').textContent = t.link; $('copy-link').textContent = t.copy;
@@ -80,6 +82,7 @@ function showControls() {
   }, 2800);
 }
 function updateControls() {
+  $('self-video').style.transform = call.cameraFacing === 'environment' ? 'none' : 'scaleX(-1)';
   for (const kind of ['audio', 'video']) {
     const track = call.local.get(kind);
     const on = !!track && !track.isMuted();
@@ -115,6 +118,7 @@ async function request(kind, automatic = false) {
     if (kind === 'video') { track.attach($('self-video')); $('self').hidden = false; }
     if (state.audio !== 'busy' && state.video !== 'busy') $('permission-help').textContent = '';
     updateControls();
+    if (kind === 'video') updateCameraSwitch();
     if (['on', 'skipped'].includes(state.audio) && ['on', 'skipped'].includes(state.video)) await ready();
     else if (state.audio === 'error' || state.video === 'error') offerSkip();
   } catch (error) {
@@ -156,6 +160,7 @@ function attemptPlay(media) {
   const result = media.play();
   result?.catch(() => { $('play').hidden = false; });
 }
+call.addEventListener('present', ({ detail: id }) => participant(id));
 call.addEventListener('remote', ({ detail: track }) => {
   const el = participant(track.getParticipantId());
   const media = document.createElement(track.getType());
@@ -187,12 +192,30 @@ for (const kind of ['audio', 'video']) {
     const button = $('toggle-' + kind); button.disabled = true;
     try {
       const track = await call.toggle(kind);
-      if (kind === 'video' && track) { track.attach($('self-video')); $('self').hidden = false; }
+      if (kind === 'video' && track) { track.attach($('self-video')); $('self').hidden = false; updateCameraSwitch(); }
       updateControls();
     } catch (error) { notice(permissionError(error, kind), false); }
     finally { button.disabled = false; showControls(); }
   };
 }
+async function updateCameraSwitch() {
+  $('switch-camera').hidden = !(await call.canSwitchCamera());
+}
+$('switch-camera').onclick = async () => {
+  const button = $('switch-camera'); button.disabled = true;
+  $('toggle-video').disabled = true;
+  try {
+    const track = await call.switchCamera();
+    if (track) { track.attach($('self-video')); updateControls(); }
+  } catch (error) {
+    const restored = call.local.get('video');
+    if (restored) restored.attach($('self-video'));
+    updateControls(); notice(permissionError(error, 'video'));
+  } finally {
+    button.disabled = false; $('toggle-video').disabled = false; showControls();
+  }
+};
+navigator.mediaDevices?.addEventListener('devicechange', updateCameraSwitch);
 $('play').onclick = async () => {
   const results = await Promise.allSettled([...document.querySelectorAll('#remote-grid audio, #remote-grid video')].map(el => el.play()));
   $('play').hidden = results.every(result => result.status === 'fulfilled');

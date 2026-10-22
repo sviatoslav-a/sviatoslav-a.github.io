@@ -11,7 +11,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%232e4d43'/%3E%3Cpath d='M19 23h18v18H19zm18 5 9-5v18l-9-5' fill='none' stroke='%23fff' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./style.css">
   <script src="./vendor/vdoninja-sdk.js" defer></script>
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=20261023-camera"></script>
 </head>
 <body>
   <main id="stage" aria-label="Call">
@@ -42,6 +42,7 @@
       <nav id="controls">
         <button id="toggle-audio" class="round-button" type="button"></button>
         <button id="toggle-video" class="round-button" type="button"></button>
+        <button id="switch-camera" class="round-button" type="button" data-icon="switch-camera" hidden></button>
         <button id="hangup" class="round-button hangup" type="button" data-icon="hangup"></button>
       </nav>
     </div>

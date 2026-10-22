@@ -31,3 +31,9 @@ The Android demo uses native Chrome permission dialogs and real WebRTC on an And
 Custom interface and adapter: Apache-2.0, see `LICENSE`.
 
 Vendored VDO.Ninja SDK 1.6.2: MPL-2.0, see `public/vendor/LICENSE`. Source: https://sdk.vdo.ninja/vdoninja-sdk.js and https://github.com/steveseguin/ninjasdk. The SDK is unmodified, with SHA-256 `cd295ad295713ca14b6c4cded2380ccd2e663952abd33bc43a76a4986a59e5ee`. Authentication changes are in the separate `secure-sdk.js` subclass. All source is distributed with the app.
+
+## Camera switching and participant visibility
+
+On devices with multiple cameras, a switch-camera button appears in the call controls. It cycles camera devices, keeps mute state, and mirrors only the front-camera preview. The previous camera is released before the next one opens; if capture fails, the app tries to restore the original camera.
+
+Authenticated receive-only connections now create a visible participant placeholder even when they send no audio or video. Possession of the full invitation still grants access: there is no identity check, waiting room, two-person limit, or protection from a participant recording the call.
